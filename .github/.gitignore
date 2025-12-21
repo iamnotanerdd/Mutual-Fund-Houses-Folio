@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local Data (Downloaded Excel files)
+# We exclude this because the automation script downloads them fresh.
+# Also keeps repo small.
+PPFAS_2025_Disclosures/
+
+# Temporary / Debug files
+debug_webapp.py
+test_app_logic.py
+~$*
+
+# Virtual Environments (if any)
+venv/
+env/
+.env
+
+# OS specific
+.DS_Store
+Thumbs.db
