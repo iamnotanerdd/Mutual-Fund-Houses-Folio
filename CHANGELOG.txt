@@ -1,0 +1,113 @@
+Change Log for Mutual Fund Automation Update
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:07:55 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: ppfas_downloader.py
+Problem: The script was hard-coded to only download files strictly for the year "2025". This meant it would permanently stop working once 2026 arrived.
+Change Made: Rewrote the logic. It now automatically detects the current year and downloads those files. It also checks the previous year so it never misses a month (like December's data arriving in January). Folders also changed from targeting "2025" to a general "PPFAS_Disclosures" folder.
+
+File: aggregate_portfolio.py
+Problem 1: It was hard-coded to combine files only if they were sitting inside the "2025" folder.
+Change Made 1: Updated the code to read all data from the new, future-proof "PPFAS_Disclosures" folder instead.
+Problem 2: The script crashed completely when reading new AMC files (like "March_2026.xls") because the mutual fund house slightly changed how their Excel files were formatted internally.
+Change Made 2: Added a backup reading method. If the first try fails, the script seamlessly switches to an 'openpyxl' system which fixes the crash and extracts the data perfectly.
+
+File: .github/workflows/update_data.yml
+Problem: You previously had to run the scripts manually, but you wanted the database to reliably update itself every single day exactly at 5:00 AM IST.
+Change Made: Created a brand new GitHub Actions command file. It commands the GitHub servers to automatically wake up, run the scripts independently, and push the updated master Excel file live automatically at precisely 5:00 AM IST.
+
+File: .gitignore
+Problem: The thousands of raw monthly Excel files being downloaded could accidentally upload to the website and bloat the storage size.
+Change Made: Updated the ignore list to hide the newly named "PPFAS_Disclosures" folder from the online repository completely, keeping your project clean.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:09:03 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: ppfas_downloader.py, aggregate_portfolio.py
+Problem: After making these large structural script changes, we had to be 100% sure the new Excel logic didn't corrupt the portfolio calculations or crash mid-way.
+Change Made: Ran deep local terminal tests. Everything processed smoothly, proving the "March_2026" error was fully resolved.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:09:25 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: CHANGELOG.txt
+Problem: You requested a way to view what adjustments were made to the project files in simple English for future reference.
+Change Made: Created this exact file.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:10:40 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: CHANGELOG.txt
+Problem: The changelog was only keeping track of the date, doing an injustice to exactly *when* the changes took place.
+Change Made: Injected the exact Hour:Minute:Second into the documentation timestamps.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:11:49 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: CHANGELOG.txt
+Problem: The changelog had missed documenting the testing events and the updates to the changelog itself.
+Change Made: Included those extra blocks into the log to ensure absolutely no shadow-actions were improperly recorded.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:12:50 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: CHANGELOG.txt
+Problem: The original log grouped updates by categories rather than tracking exactly *when* the changes arrived sequentially.
+Change Made: Rewrote the entire log to follow a strict timeline-based structural hierarchy.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:14:14 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: CHANGELOG.txt
+Problem: Descriptions were not formatted clearly enough regarding what exactly caused the edits and what those edits fixed.
+Change Made: Redesigned the log's text layout to strictly enforce a "Problem:" and "Change Made:" readability paradigm.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:15:32 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: CHANGELOG.txt
+Problem: The log entries lower down the document used an "Action:" label instead of specifying the exact file names that were handled in that timestamp block.
+Change Made: Standardized every single log entry locally, globally replacing "Action:" and "File/Area:" explicitly with a strict "File: {filename}" key so every single adjustment can be mapped back to one specific document.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:17:04 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: CHANGELOG.txt
+Problem: The raw timestamps were floating plainly in the text, blending in and making it difficult to skip between events at a glance.
+Change Made: Added striking visual text-art borders and alarm clock emojis to completely highlight the time entries.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:18:41 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: .github/workflows/update_data.yml
+Problem: The automation was set to run only once a day at 5:00 AM IST, but you decided the database needs to be updated much more frequently at the start of every single hour.
+Change Made: Updated the scheduled 'cron' trigger from a daily time block to '0 * * * *'. The GitHub server will now fetch and sync the newest data at minute zero of every single hour (e.g. 1:00, 2:00, 3:00) without fail.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏰  [12 April 2026, 14:22:51 IST]  ⏰
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File: aggregate_portfolio.py
+Problem: The final Excel file displayed the scraped factsheets chronologically (left to right), forcing you to scroll all the way to the right to see the newest data.
+Change Made: Reversed the month sorting logic so that the newest month is rendered strictly as the first data column on the left, making it instantly readable.

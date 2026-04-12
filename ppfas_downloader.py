@@ -6,7 +6,7 @@ import datetime
 
 # Configuration
 BASE_URL = "https://amc.ppfas.com/downloads/portfolio-disclosure/"
-DOWNLOAD_DIR = "PPFAS_2025_Disclosures"
+DOWNLOAD_DIR = "PPFAS_Disclosures"
 TARGET_SCHEAM_NAME = "Parag Parikh Flexi Cap Fund"
 
 def get_monthly_links(year):
@@ -129,14 +129,18 @@ def download_file(url, filename, folder):
         print(f"Failed to download {filename}: {e}")
 
 def main():
-    current_year = 2025 # Or datetime.date.today().year
-    print(f"Starting downloader for Year {current_year}...")
+    current_year = datetime.date.today().year
+    print(f"Starting downloader for up to Year {current_year}...")
     
     links = get_monthly_links(current_year)
     
+    # Also check the previous year to make sure we don't miss recent data near the start of the year
+    links_prev = get_monthly_links(current_year - 1)
+    if links_prev:
+        links.extend(links_prev)
+    
     if not links:
         print("No links found. Please check the website structure or year.")
-        # Fallback debug: print all links in that year container?
         return
 
     print(f"Found {len(links)} disclosure files.")

@@ -4,8 +4,7 @@ import glob
 from openpyxl import Workbook
 
 # Configuration
-# Configuration
-INPUT_FOLDER = "PPFAS_2025_Disclosures"
+INPUT_FOLDER = "PPFAS_Disclosures"
 OUTPUT_FILE = "PPFAS_Equity_Analysis.xlsx"
 
 COLUMN_MAPPING = {
@@ -31,7 +30,12 @@ def normalize_header(header):
 def read_portfolio_file(filepath):
     try:
         # Read roughly to find header
-        df_raw = pd.read_excel(filepath, engine='xlrd', header=None)
+        try:
+            df_raw = pd.read_excel(filepath, engine='xlrd', header=None)
+            engine = 'xlrd'
+        except Exception as e:
+            df_raw = pd.read_excel(filepath, engine='openpyxl', header=None)
+            engine = 'openpyxl'
         
         # 1. Find Column Header
         header_row_idx = -1
@@ -44,7 +48,7 @@ def read_portfolio_file(filepath):
         if header_row_idx == -1: return None
         
         # Reload with header. Note: Data starts after this.
-        df = pd.read_excel(filepath, engine='xlrd', header=header_row_idx)
+        df = pd.read_excel(filepath, engine=engine, header=header_row_idx)
         
         # Rename columns
         new_cols = {}
@@ -147,7 +151,7 @@ def main():
             return (9999, 99)
         except: return (9999, 99)
 
-    sorted_months = sorted(list(all_months), key=sort_months_key)
+    sorted_months = sorted(list(all_months), key=sort_months_key, reverse=True)
     
     # Build Excel
     wb = Workbook()
