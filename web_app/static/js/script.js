@@ -53,10 +53,11 @@ function renderTable(data) {
     // Header Row 2: Sub-headers
     const tr2 = document.createElement('tr');
     data.months.forEach(() => {
-        ['Qty', 'Val (L)', '% Net', '% Change'].forEach(sub => {
+        ['Qty', 'Val (L)', '% Net', '% Change'].forEach((sub, idx) => {
             const th = document.createElement('th');
             th.textContent = sub;
             th.className = 'sub-header d-num'; // Right align headers too for numbers?
+            if (idx === 3) th.classList.add('month-divider');
             tr2.appendChild(th);
         });
     });
@@ -96,17 +97,26 @@ function renderTable(data) {
             // Pct
             const tdPct = document.createElement('td');
             tdPct.textContent = (mData.Pct * 100).toFixed(2) + '%';
-            tdPct.className = 'd-num d-pct';
+            tdPct.className = 'd-num text-blue';
             tr.appendChild(tdPct);
 
             // Qty Change
             const tdQtyChange = document.createElement('td');
             if (mData.QtyChange !== null && mData.QtyChange !== undefined) {
-                tdQtyChange.textContent = (mData.QtyChange * 100).toFixed(2) + '%';
+                let changeVal = mData.QtyChange * 100;
+                tdQtyChange.textContent = changeVal.toFixed(2) + '%';
+                
+                if (changeVal > 0) {
+                    tdQtyChange.className = 'd-num text-green month-divider';
+                } else if (changeVal < 0) {
+                    tdQtyChange.className = 'd-num text-red month-divider';
+                } else {
+                    tdQtyChange.className = 'd-num month-divider';
+                }
             } else {
                 tdQtyChange.textContent = '0.00%';
+                tdQtyChange.className = 'd-num month-divider';
             }
-            tdQtyChange.className = 'd-num d-pct';
             tr.appendChild(tdQtyChange);
         });
 
