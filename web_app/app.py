@@ -33,7 +33,7 @@ def read_portfolio_data():
     
     # Extract unique ordered months from the merged cells row
     months = []
-    for i in range(3, len(month_row), 3):
+    for i in range(3, len(month_row), 4):
         val = month_row[i]
         if pd.notna(val):
             months.append(val)
@@ -72,13 +72,15 @@ def read_portfolio_data():
             qty = clean(row[col_idx])
             val = clean(row[col_idx+1])
             pct = clean(row[col_idx+2])
+            qtyChange = clean(row[col_idx+3]) if len(row) > col_idx + 3 else 0.0
             
             record["Months"][m] = {
                 "Quantity": qty,
                 "Value": val,
-                "Pct": pct
+                "Pct": pct,
+                "QtyChange": qtyChange
             }
-            col_idx += 3
+            col_idx += 4
             
         data.append(record)
         
