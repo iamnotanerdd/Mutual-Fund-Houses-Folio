@@ -177,28 +177,46 @@ def main():
     for m in sorted_months:
         # Tier 1 Header (Month) at Row 2
         c = ws.cell(2, col_idx, m)
-        ws.merge_cells(start_row=2, start_column=col_idx, end_row=2, end_column=col_idx+2)
+        ws.merge_cells(start_row=2, start_column=col_idx, end_row=2, end_column=col_idx+3)
         
         # Tier 2 Headers at Row 3
         ws.cell(3, col_idx, "Quantity")
         ws.cell(3, col_idx+1, "Market Value (Rs. Lakhs)")
         ws.cell(3, col_idx+2, "% Net Assets")
+        ws.cell(3, col_idx+3, "% Change in Qty")
         
         # Init totals
         column_totals[col_idx] = 0.0   # Qty
         column_totals[col_idx+1] = 0.0 # Val
         column_totals[col_idx+2] = 0.0 # Pct
+        column_totals[col_idx+3] = 0.0 # Qty Change
         
-        col_idx += 3
+        col_idx += 4
         
     final_col_idx = col_idx - 1
     
     # Merge Title
     ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=final_col_idx)
 
+    # Sort portfolio items based on PctAssets in the latest month
+    latest_month = sorted_months[0] if sorted_months else None
+    
+    def sort_portfolio_key(item):
+        isin_val, data_val = item
+        if latest_month and latest_month in data_val['Months']:
+            try:
+                # Use PctAssets for sorting, default to 0.0 if not found
+                pct_val = float(data_val['Months'][latest_month].get('PctAssets') or 0.0)
+                return pct_val
+            except:
+                return 0.0
+        return 0.0
+
+    sorted_portfolio = sorted(portfolio.items(), key=sort_portfolio_key, reverse=True)
+
     # Data Rows (Start at Row 4)
     row_idx = 4
-    for isin, data in portfolio.items():
+    for isin, data in sorted_portfolio:
         ws.cell(row_idx, 1, data['Name'])
         ws.cell(row_idx, 2, isin)
         ws.cell(row_idx, 3, data['Rating'])
@@ -229,6 +247,24 @@ def main():
             node_val = m_data.get('MarketValue')
             node_pct = m_data.get('PctAssets')
             
+            qty_change = None
+            m_idx = sorted_months.index(m)
+            if m_idx + 1 < len(sorted_months):
+                prev_m = sorted_months[m_idx + 1]
+                prev_qty_raw = data['Months'].get(prev_m, {}).get('Quantity')
+                if node_qty is not None or prev_qty_raw is not None:
+                    try:
+                        curr_q = float(node_qty) if node_qty is not None else 0.0
+                        prev_q = float(prev_qty_raw) if prev_qty_raw is not None else 0.0
+                        if prev_q > 0:
+                            qty_change = (curr_q - prev_q) / prev_q
+                        elif curr_q > 0:
+                            qty_change = 1.0
+                        else:
+                            qty_change = 0.0
+                    except:
+                        pass
+            
             def write_val(c_idx, raw_val, sum_key):
                 v_float = 0.0
                 try: v_float = float(raw_val)
@@ -245,8 +281,9 @@ def main():
             write_val(col_idx, node_qty, 'Quantity')
             write_val(col_idx+1, node_val, 'MarketValue')
             write_val(col_idx+2, node_pct, 'PctAssets')
+            write_val(col_idx+3, qty_change, 'QtyChange')
             
-            col_idx += 3
+            col_idx += 4
         row_idx += 1
 
     # Totals Row
@@ -255,7 +292,11 @@ def main():
     
     # Write sums
     for c_idx, total_val in column_totals.items():
-        ws.cell(total_row, c_idx, total_val)
+        # Do not sum the % Change in Qty column
+        if (c_idx - 4) % 4 != 3:
+            ws.cell(total_row, c_idx, total_val)
+        else:
+            ws.cell(total_row, c_idx, None)
 
     # Apply Formatting
     
@@ -285,12 +326,11 @@ def main():
         bottom = Side(style='thin')
         
         # Check for Month Block Separator
-        # Month blocks end at 6, 9, 12... 
-        # (c_idx) % 3 == 0?  No, static is 3 cols.
-        # Month 1: 4,5,6. End at 6. (6-3)%3 == 0. Correct.
-        # Static: 1,2,3. End at 3. (3-3)%3 == 0. Correct.
+        # Month blocks now have 4 columns each.
+        # Static: 1,2,3. End at 3. (3-3)%4 == 0. Correct.
+        # Month 1: 4,5,6,7. End at 7. (7-3)%4 == 0. Correct.
         
-        if c_idx >= 3 and (c_idx - 3) % 3 == 0:
+        if c_idx >= 3 and (c_idx - 3) % 4 == 0:
             right = Side(style='medium')
             
         return Border(left=left, right=right, top=top, bottom=bottom)
@@ -335,12 +375,14 @@ def main():
             # Number Formats
             c_idx = cell.column
             if c_idx >= 4:
-                rem = (c_idx - 4) % 3
+                rem = (c_idx - 4) % 4
                 if rem == 0: # Quantity
                     cell.number_format = fmt_indian_int
                 elif rem == 1: # Value
                     cell.number_format = fmt_indian_float
                 elif rem == 2: # Pct
+                    cell.number_format = fmt_pct
+                elif rem == 3: # Qty Change
                     cell.number_format = fmt_pct
                     
     # Column Widths
