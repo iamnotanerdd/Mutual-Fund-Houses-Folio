@@ -44,7 +44,7 @@ function renderTable(data) {
     data.months.forEach(m => {
         const th = document.createElement('th');
         th.textContent = m;
-        th.colSpan = 3; // Qty, Val, Pct
+        th.colSpan = 4; // Qty, Val, Pct, QtyChange
         th.className = 'month-header';
         tr1.appendChild(th);
     });
@@ -53,7 +53,7 @@ function renderTable(data) {
     // Header Row 2: Sub-headers
     const tr2 = document.createElement('tr');
     data.months.forEach(() => {
-        ['Qty', 'Val (L)', '% Net'].forEach(sub => {
+        ['Qty', 'Val (L)', '% Net', '% Change'].forEach(sub => {
             const th = document.createElement('th');
             th.textContent = sub;
             th.className = 'sub-header d-num'; // Right align headers too for numbers?
@@ -79,7 +79,7 @@ function renderTable(data) {
 
         // Dynamic Data
         data.months.forEach(m => {
-            const mData = rec.Months[m] || { Quantity: 0, Value: 0, Pct: 0 };
+            const mData = rec.Months[m] || { Quantity: 0, Value: 0, Pct: 0, QtyChange: 0 };
 
             // Quantity
             const tdQty = document.createElement('td');
@@ -98,6 +98,16 @@ function renderTable(data) {
             tdPct.textContent = (mData.Pct * 100).toFixed(2) + '%';
             tdPct.className = 'd-num d-pct';
             tr.appendChild(tdPct);
+
+            // Qty Change
+            const tdQtyChange = document.createElement('td');
+            if (mData.QtyChange !== null && mData.QtyChange !== undefined) {
+                tdQtyChange.textContent = (mData.QtyChange * 100).toFixed(2) + '%';
+            } else {
+                tdQtyChange.textContent = '0.00%';
+            }
+            tdQtyChange.className = 'd-num d-pct';
+            tr.appendChild(tdQtyChange);
         });
 
         tbody.appendChild(tr);
